@@ -1,0 +1,77 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  height: 100vh;
+  background-color: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-main {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-overlay {
+  position: fixed;
+  inset: 0;
+  background: url(./assets/img/train.png);
+  opacity: 40%;
+  z-index: 999;
+}
+
+.app-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #111;
+  padding: 40px 30px;
+  border-radius: 20px;
+  width: 494px;
+  height: 324px;
+  z-index: 1000;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.app-title {
+  color: #fff;
+  margin-bottom: 20px;
+  font-size: 36px;
+}
+
+.app-btn {
+  width: 330px;
+  height: 59px;
+  margin: 10px auto;
+  border: none;
+  border-radius: 20px;
+  font-size: 18px;
+  cursor: pointer;
+  line-height: 59px;
+  transition: 0.2s ease;
+}
+
+.app-btn-teacher, .app-btn-student {
+  background: red;
+  color: #fff;
+}
+
+.app-btn:hover {
+  opacity: 0.85;
+  transform: scale(1.02);
+}

@@ -1,0 +1,82 @@
+
+.control-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.control-header {
+  color: #fff;
+  font-size: 32px;
+  margin-bottom: 72px;
+}
+
+.control-grid {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  gap: 10px;
+}
+
+.control-section-title {
+  background: red;
+  color: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.control-section-help {
+  background: red;
+  color: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.control-cell {
+  background: #333;
+  padding: 12px;
+  border-radius: 8px;
+  color: #ddd;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.control-cell-key {
+  justify-content: center;
+  font-weight: bold;
+  color: #fff;
+}
+
+.control-cell-value {
+  text-align: center;
+  color: #fff;
+  justify-content: center;
+}
+
+.control-btn-back {
+  width: 200px;
+  padding: 12px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 10px;
+  background: red;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.control-btn-back:hover {
+  opacity: 0.85;
+  transform: scale(1.02);
+}
+
+.control-container input[type="range"] {
+  width: 100%;
+  margin-left: 10px;
+}

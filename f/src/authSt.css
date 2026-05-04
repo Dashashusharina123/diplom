@@ -1,0 +1,88 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: url(./assets/img/train.png);
+  opacity: 40%;
+  z-index: 999;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #111;
+  padding: 30px;
+  border-radius: 16px;
+  width: 494px;
+  min-height: 400px;
+  z-index: 1000;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+.modal h1 {
+  color: #fff;
+  margin-bottom: 20px;
+  font-size: 36px;
+}
+
+.input {
+  width: 100%;
+  max-width: 386px;
+  height: 59px;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  background: #333;
+  color: #fff;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.input::placeholder {
+  color: #aaa;
+}
+
+.btn {
+  width: 100%;
+  max-width: 386px;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: red;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 10px;
+  transition: 0.2s;
+  box-sizing: border-box;
+}
+
+.btn.back {
+  background: #555;
+  margin-top: 5px;
+}
+
+.btn:hover {
+  opacity: 0.85;
+  transform: scale(1.02);
+}

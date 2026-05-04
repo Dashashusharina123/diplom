@@ -1,0 +1,74 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  height: 100vh;
+  background: url('../img/train.png') center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.modal {
+  position: relative;
+  background: #111;
+  padding: 40px 30px;
+  border-radius: 20px;
+  text-align: center;
+  width: 494px;
+  height: 324px;
+  z-index: 1;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal h1 {
+  color: #fff;
+  margin-bottom: 20px;
+  font-size: 36px;
+}
+
+.btn {
+  display: block;
+  width: 330px;
+  height: 59px;
+  margin: 10px auto;
+  border: none;
+  border-radius: 20px;
+  font-size: 18px;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  transition: 0.2s ease;
+  line-height: 59px; 
+  padding: 0;
+}
+
+.btn.learn {
+  background: red;
+  color: #fff;
+}
+
+.btn.test {
+  background: red;
+  color: #fff;
+}
+
+.btn:hover {
+  background-color: #e21a1a;
+  opacity: 50%;
+  transform: scale(1.02);
+}

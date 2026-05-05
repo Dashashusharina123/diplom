@@ -13,10 +13,26 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->string('email')->nullable()->unique();
+            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('fio')->nullable();
+            $table->string('title')->nullable();
+            $table->enum('role', ['teacher', 'trainee'])->default('trainee');
             $table->rememberToken();
             $table->timestamps();
         });
+
+        // Вставляем учителя по умолчанию с паролем 1234
+        DB::table('users')->insert([
+            'email' => 'teacher@example.com',
+            'password' => \Illuminate\Support\Facades\Hash::make('1234'),
+            'fio' => 'Учитель',
+            'title' => 'Преподаватель',
+            'role' => 'teacher',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();

@@ -18,10 +18,23 @@ class User extends Authenticatable
 
     protected $fillable = [
         'password',
+        'fio',
+        'title',
+        'role', // 'teacher' или 'trainee'
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
     ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    // Связь с результатами
+    public function results()
+    {
+        return $this->hasMany(Result::class, 'user_id');
+    }
 }

@@ -21,7 +21,6 @@ export interface Result {
     task_id?: number;
 }
 
-// Документ ГУ-23
 export interface DocumentGY {
     id: number;
     result_id: number;
@@ -44,7 +43,6 @@ export interface DocumentGY {
     updated_at: string;
 }
 
-// Документ ЛУ-23
 export interface DocumentLY {
     id: number;
     result_id: number;
@@ -81,98 +79,124 @@ class ApiClient {
                 'Content-Type': 'application/json',
                 ...options.headers,
             },
+            credentials: 'include',
             ...options,
         });
 
         if (!response.ok) {
-            const error = await response.json();
+            const error = await response.json().catch(() => ({ message: 'API request failed' }));
             throw new Error(error.message || 'API request failed');
         }
 
         return response.json();
     }
 
-    // Tasks
+    // ========== АУТЕНТИФИКАЦИЯ ==========
+    async teacherLogin(password: string): Promise<{ success: boolean; message: string; role?: string }> {
+        return this.request('/auth/teacher/login', {
+            method: 'POST',
+            body: JSON.stringify({ password }),
+        });
+    }
+
+    async teacherLogout(): Promise<{ success: boolean; message: string }> {
+        return this.request('/auth/teacher/logout', { method: 'POST' });
+    }
+
+    async checkTeacherAuth(): Promise<{ authenticated: boolean; role?: string }> {
+        return this.request('/auth/teacher/check');
+    }
+
+    // ✅ ДОБАВЛЯЕМ saveTrainee
+    async saveTrainee(fio: string, title: string): Promise<any> {
+        return this.request('/auth/trainee/register', {
+            method: 'POST',
+            body: JSON.stringify({ fio, title }),
+        });
+    }
+
+    // ✅ ДОБАВЛЯЕМ registerTrainee (алиас для saveTrainee)
+    async registerTrainee(fio: string, title: string): Promise<any> {
+        return this.saveTrainee(fio, title);
+    }
+
+    // ========== ЗАДАНИЯ ==========
     async getTasks(): Promise<Task[]> {
-        return this.request<Task[]>('/tasks');
+        return this.request('/tasks');
     }
 
     async createTask(data: { title: string; description: string }): Promise<Task> {
-        return this.request<Task>('/tasks', {
+        return this.request('/tasks', {
             method: 'POST',
             body: JSON.stringify(data),
         });
     }
 
     async updateTask(id: number, data: { title: string; description: string }): Promise<Task> {
-        return this.request<Task>(`/tasks/${id}`, {
+        return this.request(`/tasks/${id}`, {
             method: 'PUT',
             body: JSON.stringify(data),
         });
     }
 
     async deleteTask(id: number): Promise<void> {
-        return this.request<void>(`/tasks/${id}`, {
-            method: 'DELETE',
-        });
+        return this.request(`/tasks/${id}`, { method: 'DELETE' });
     }
 
-    // Results
+    // ========== РЕЗУЛЬТАТЫ ==========
     async getResults(search?: string): Promise<Result[]> {
         const query = search ? `?search=${encodeURIComponent(search)}` : '';
-        return this.request<Result[]>(`/results${query}`);
+        return this.request(`/results${query}`);
     }
 
     async saveResult(data: CreateResultData): Promise<Result> {
-        return this.request<Result>('/results', {
+        return this.request('/results', {
             method: 'POST',
             body: JSON.stringify(data),
         });
     }
 
-    // Trainees
-    async saveTrainee(fio: string, title: string): Promise<any> {
-        return this.request<any>('/trainees', {
+    // ========== УЧЕНИКИ (старый эндпоинт, оставляем для совместимости) ==========
+    async getTrainees(): Promise<any[]> {
+        return this.request('/trainees');
+    }
+
+    async getTrainee(id: number): Promise<any> {
+        return this.request(`/trainees/${id}`);
+    }
+
+    async createTrainee(data: { fio: string; title?: string }): Promise<any> {
+        return this.request('/trainees', {
             method: 'POST',
-            body: JSON.stringify({ fio, title }),
+            body: JSON.stringify(data),
         });
     }
 
-    // Teacher login
-    async teacherLogin(password: string): Promise<{ success: boolean; message: string }> {
-        return this.request<{ success: boolean; message: string }>('/teacher/login', {
-            method: 'POST',
-            body: JSON.stringify({ password }),
-        });
-    }
-
-    // Document GY-23
+    // ========== ДОКУМЕНТЫ ==========
     async saveDocumentGY(data: Partial<DocumentGY> & { result_id: number; trainee_id: number; task_id: number }): Promise<{ success: boolean; data: DocumentGY }> {
-        return this.request<{ success: boolean; data: DocumentGY }>('/documents/gu23', {
+        return this.request('/documents/gu23', {
             method: 'POST',
             body: JSON.stringify(data),
         });
     }
 
     async getDocumentGY(resultId: number): Promise<{ success: boolean; data: DocumentGY }> {
-        return this.request<{ success: boolean; data: DocumentGY }>(`/documents/gu23/${resultId}`);
+        return this.request(`/documents/gu23/${resultId}`);
     }
 
-    // Document LY-23
     async saveDocumentLY(data: Partial<DocumentLY> & { result_id: number; trainee_id: number; task_id: number }): Promise<{ success: boolean; data: DocumentLY }> {
-        return this.request<{ success: boolean; data: DocumentLY }>('/documents/ly23', {
+        return this.request('/documents/ly23', {
             method: 'POST',
             body: JSON.stringify(data),
         });
     }
 
     async getDocumentLY(resultId: number): Promise<{ success: boolean; data: DocumentLY }> {
-        return this.request<{ success: boolean; data: DocumentLY }>(`/documents/ly23/${resultId}`);
+        return this.request(`/documents/ly23/${resultId}`);
     }
 
-    // Get all documents by trainee
     async getDocumentsByTrainee(traineeId: number): Promise<{ success: boolean; data: { gu23: DocumentGY[]; ly23: DocumentLY[] } }> {
-        return this.request<{ success: boolean; data: { gu23: DocumentGY[]; ly23: DocumentLY[] } }>(`/documents/trainee/${traineeId}`);
+        return this.request(`/documents/trainee/${traineeId}`);
     }
 }
 

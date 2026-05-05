@@ -1,0 +1,258 @@
+/* Общие стили для страниц ученика */
+.trainee-container {
+    min-height: 100vh;
+    background: #111;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Шапка */
+.trainee-header {
+    background: #1a1a1a;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+}
+
+.trainee-header h1 {
+    color: #fff;
+    font-size: 24px;
+    margin: 0;
+}
+
+.trainee-header button {
+    background: red;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.trainee-header button:hover {
+    opacity: 0.85;
+    transform: scale(1.02);
+}
+
+/* Навигация */
+.trainee-nav {
+    background: #222;
+    padding: 0 24px;
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid #333;
+}
+
+.trainee-nav button {
+    background: none;
+    border: none;
+    color: #aaa;
+    padding: 14px 24px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.2s;
+}
+
+.trainee-nav button:hover {
+    color: #fff;
+    background: #333;
+}
+
+.trainee-nav button.active {
+    color: #fff;
+    border-bottom: 3px solid red;
+}
+
+/* Контент */
+.trainee-content {
+    padding: 24px;
+    flex: 1;
+}
+
+/* Карточка пользователя */
+.trainee-user-card {
+    background: #1a1a1a;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border: 1px solid #333;
+}
+
+.trainee-user-icon {
+    font-size: 64px;
+}
+
+.trainee-user-info h2 {
+    color: #fff;
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.trainee-user-info p {
+    color: #aaa;
+    font-size: 14px;
+}
+
+/* Статистика */
+.trainee-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.trainee-stat-card {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 16px;
+    padding: 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.trainee-stat-card:hover {
+    transform: translateY(-5px);
+    border-color: red;
+    background: #222;
+}
+
+.trainee-stat-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+}
+
+.trainee-stat-number {
+    font-size: 48px;
+    font-weight: bold;
+    color: red;
+    margin-bottom: 8px;
+}
+
+.trainee-stat-label {
+    color: #aaa;
+    font-size: 16px;
+}
+
+/* Сетка задач */
+.trainee-task-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.trainee-task-card {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 16px;
+    padding: 20px;
+    transition: 0.2s;
+}
+
+.trainee-task-card:hover {
+    border-color: red;
+    transform: translateY(-3px);
+}
+
+.trainee-task-title {
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+.trainee-task-desc {
+    color: #aaa;
+    font-size: 14px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.trainee-task-btn {
+    background: red;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    width: 100%;
+    transition: 0.2s;
+}
+
+.trainee-task-btn:hover {
+    opacity: 0.85;
+    transform: scale(1.02);
+}
+
+/* Таблица результатов */
+.trainee-table {
+    width: 100%;
+    background: #1a1a1a;
+    border-radius: 16px;
+    overflow: hidden;
+    border-collapse: collapse;
+}
+
+.trainee-table th {
+    background: #222;
+    color: #fff;
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 1px solid #333;
+}
+
+.trainee-table td {
+    padding: 14px 16px;
+    color: #ddd;
+    border-bottom: 1px solid #333;
+}
+
+.trainee-table tr:hover td {
+    background: #252525;
+}
+
+/* Бейджи результатов */
+.score-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.score-good {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4caf50;
+    border: 1px solid #4caf50;
+}
+
+.score-bad {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+    border: 1px solid #ffc107;
+}
+
+/* Загрузка и пустые состояния */
+.loading {
+    text-align: center;
+    padding: 60px;
+    color: #aaa;
+    font-size: 18px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px;
+    color: #666;
+    font-size: 18px;
+    background: #1a1a1a;
+    border-radius: 16px;
+}

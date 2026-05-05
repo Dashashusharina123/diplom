@@ -11,22 +11,36 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Удаляем старую таблицу если есть
+        Schema::dropIfExists('document__g_y_s');
+
+        // Создаем новую с правильными полями
         Schema::create('document__g_y_s', function (Blueprint $table) {
             $table->id();
-            $table->date('data');
-            $table->string('train');
-            $table->string('vagon');
-            $table->string('station_from');
-            $table->string('station_to');
-            $table->string('station_code');
-            $table->string('section');
-            $table->string('participants');
-            $table->string('carrier');
-            $table->string('shipment');
-            $table->date('cargo_receive');
-            $table->string('cargo');
-            $table->text('description');
+            // Добавляем поля для связей
+            $table->unsignedBigInteger('result_id')->nullable();
+            $table->unsignedBigInteger('trainee_id')->nullable();
+            $table->unsignedBigInteger('task_id')->nullable();
+            // Поля документа
+            $table->date('data')->nullable();
+            $table->string('train')->nullable();
+            $table->string('vagon')->nullable();
+            $table->string('station_from')->nullable();
+            $table->string('station_to')->nullable();
+            $table->string('station_code')->nullable();
+            $table->string('section')->nullable();
+            $table->string('participants')->nullable();
+            $table->string('carrier')->nullable();
+            $table->string('shipment')->nullable();
+            $table->date('cargo_receive')->nullable();
+            $table->string('cargo')->nullable();
+            $table->text('description')->nullable();
             $table->timestamps();
+
+            // Добавляем индексы для быстрого поиска
+            $table->index('result_id');
+            $table->index('trainee_id');
+            $table->index('task_id');
         });
     }
 

@@ -75,3 +75,25 @@ body {
   opacity: 0.85;
   transform: scale(1.02);
 }
+.auth-register-link {
+    color: #fff;
+    margin: 15px 0 10px;
+    font-size: 14px;
+}
+
+.auth-register-link button {
+    background: none;
+    border: none;
+    color: red;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.auth-register-link button:hover {
+    text-decoration: underline;
+}
+
+.auth-message {
+    margin-bottom: 10px;
+    font-size: 14px;
+}

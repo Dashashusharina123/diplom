@@ -25,4 +25,14 @@ class Result extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+    public function documentGY()
+    {
+        return $this->hasOne(Document_GY::class, 'result_id');
+    }
+
+    // Связь с документами ЛУ-23
+    public function documentLY()
+    {
+        return $this->hasOne(Document_LY::class, 'result_id');
+    }
 }

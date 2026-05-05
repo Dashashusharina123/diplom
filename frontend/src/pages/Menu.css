@@ -1,0 +1,74 @@
+.menu-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.menu-card {
+    background: white;
+    border-radius: 24px;
+    padding: 48px 40px;
+    width: 400px;
+    max-width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.menu-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+}
+
+.menu-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 32px;
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.menu-btn {
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.menu-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+.menu-btn-teacher {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.menu-btn-student {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+}
+
+.menu-btn-icon {
+    font-size: 24px;
+}
+
+.menu-footer {
+    color: #999;
+    font-size: 12px;
+}

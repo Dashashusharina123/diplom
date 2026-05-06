@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('task_id')->nullable();
             $table->string('score');
             $table->string('time');
+            $table->text('teacher_comment')->nullable();
             $table->unsignedBigInteger('trainee_id')->nullable();
             $table->timestamps();
         });

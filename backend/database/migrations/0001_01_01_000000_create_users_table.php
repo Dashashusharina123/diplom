@@ -3,17 +3,21 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->string('email')->nullable()->unique();
+            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('fio')->nullable();
+            $table->string('title')->nullable();
+            $table->enum('role', ['teacher', 'trainee'])->default('trainee');
             $table->rememberToken();
             $table->timestamps();
         });
@@ -32,11 +36,23 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
+
+        // Вставляем учителя только если его ещё нет
+        $exists = DB::table('users')->where('email', 'teacher@example.com')->exists();
+
+        if (!$exists) {
+            DB::table('users')->insert([
+                'email' => 'teacher@example.com',
+                'password' => Hash::make('1234'),
+                'fio' => 'Учитель',
+                'title' => 'Преподаватель',
+                'role' => 'teacher',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('users');

@@ -1,0 +1,252 @@
+.document-fill-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: #111;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.document-fill-content {
+    display: flex;
+    gap: 24px;
+    padding: 20px;
+}
+
+/* Левая панель - форма */
+.fill-form-panel {
+    flex: 1;
+    background: #1a1a1a;
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid #333;
+}
+
+.fill-form-panel h3 {
+    color: #fff;
+    margin-bottom: 20px;
+    font-size: 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #333;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    color: #aaa;
+    font-size: 13px;
+}
+
+.form-group input {
+    background: #222;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: #fff;
+    font-size: 14px;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: red;
+}
+
+.test-result-info {
+    background: #222;
+    border-radius: 8px;
+    padding: 12px;
+    margin: 16px 0;
+    text-align: center;
+}
+
+.test-result-info p {
+    color: #ffc107;
+    font-size: 14px;
+    margin: 0;
+}
+
+.error-message {
+    background: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+    padding: 12px;
+    border-radius: 8px;
+    margin: 16px 0;
+    text-align: center;
+}
+
+.form-actions {
+    display: flex;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.cancel-btn {
+    flex: 1;
+    background: #555;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.submit-btn {
+    flex: 1;
+    background: red;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Правая панель - предпросмотр */
+.document-preview-panel {
+    flex: 1;
+    background: #1a1a1a;
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+}
+
+.document-preview-panel h3 {
+    color: #fff;
+    margin-bottom: 16px;
+    font-size: 18px;
+}
+
+.preview-scroll {
+    flex: 1;
+    overflow-y: auto;
+    background: #f5f5f5;
+    border-radius: 10px;
+    padding: 20px;
+    max-height: 500px;
+}
+
+.document-preview {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
+    line-height: 1.8;
+    background: white;
+    padding: 24px;
+    border-radius: 8px;
+}
+
+.doc-form-number {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.doc-title {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+}
+
+.doc-row {
+    margin-bottom: 12px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.doc-label {
+    width: 160px;
+    color: #555;
+}
+
+.doc-value {
+    flex: 1;
+    border-bottom: 1px solid #999;
+    min-width: 150px;
+}
+
+.doc-signatures {
+    margin-top: 40px;
+}
+
+.doc-signature-line {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+/* Успех */
+.success-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.success-modal {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+}
+
+.success-icon {
+    width: 70px;
+    height: 70px;
+    background: #4caf50;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    color: white;
+    margin: 0 auto 20px;
+}
+
+.success-modal h2 {
+    color: white;
+    margin-bottom: 10px;
+}
+
+.success-modal p {
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 20px;
+}
+
+.success-modal button {
+    background: white;
+    color: #667eea;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .document-fill-content {
+        flex-direction: column;
+    }
+}

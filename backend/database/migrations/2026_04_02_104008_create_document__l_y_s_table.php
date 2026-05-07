@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('document__l_y_s', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('result_id')->nullable();
             $table->date('data');
             $table->string('train');
             $table->string('vagon');

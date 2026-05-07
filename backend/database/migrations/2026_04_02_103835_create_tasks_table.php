@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('description')->nullable();
+            $table->boolean('is_visible')->default(true);
+            $table->foreignId('group_id')->nullable()->constrained('groups')->nullOnDelete();
             // Делаем поля nullable
             $table->unsignedBigInteger('document_l_y_id')->nullable();
             $table->unsignedBigInteger('document_g_y_id')->nullable();

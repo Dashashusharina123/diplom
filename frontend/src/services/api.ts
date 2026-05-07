@@ -1,179 +1,124 @@
-// frontend/src/services/api.ts
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+// ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
+const getToken = () => localStorage.getItem('token');
+const setToken = (token: string) => localStorage.setItem('token', token);
+const removeToken = () => localStorage.removeItem('token');
 
-export interface Task {
-    id: number;
-    title: string;
-    description: string;
-    created_at: string;
-    updated_at: string;
+async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+    const token = getToken();
+    
+    const response = await fetch(`${API_URL}${endpoint}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            ...(token && { 'Authorization': `Bearer ${token}` }),
+            ...options.headers,
+        },
+        credentials: 'include',
+        ...options,
+    });
+
+    if (response.status === 401) {
+        removeToken();
+        window.location.href = '/login';
+    }
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'API error');
+    }
+
+    return response.json();
 }
 
-export interface Result {
-    id: number;
-    name: string;
-    session: string;
-    time: string;
-    score: string;
-    doc: string;
-    trainee_id?: number;
-    task_id?: number;
-}
+// ========== API МЕТОДЫ ==========
+export const api = {
+    // Учитель (сессии)
+    teacher: {
+        login: (password: string) =>
+            request<{ success: boolean; message: string; role: string; teacher_id: number; user: any }>(
+                '/auth/teacher/login',
+                { method: 'POST', body: JSON.stringify({ password }) }
+            ),
+        logout: () =>
+            request('/auth/teacher/logout', { method: 'POST' }),
+        check: () =>
+            request<{ authenticated: boolean; role: string | null; teacher_id: number | null }>(
+                '/auth/teacher/check'
+            ),
+    },
 
-// Документ ГУ-23
-export interface DocumentGY {
-    id: number;
-    result_id: number;
-    trainee_id: number;
-    task_id: number;
-    data: string;
-    train: string;
-    vagon: string;
-    station_from: string;
-    station_to: string;
-    station_code: string;
-    section: string;
-    participants: string;
-    carrier: string;
-    shipment: string;
-    cargo_receive: string;
-    cargo: string;
-    description: string;
-    created_at: string;
-    updated_at: string;
-}
+    // Ученики (регистрация по ФИО)
+    trainee: {
+        register: (data: { fio: string; title?: string }) =>
+            request<{ success: boolean; message: string; data: any; is_new: boolean }>(
+                '/auth/trainee/register',
+                { method: 'POST', body: JSON.stringify(data) }
+            ),
+        getAll: () => request<any[]>('/trainees'),
+        getOne: (id: number) => request<any>(`/trainees/${id}`),
+    },
 
-// Документ ЛУ-23
-export interface DocumentLY {
-    id: number;
-    result_id: number;
-    trainee_id: number;
-    task_id: number;
-    data: string;
-    train: string;
-    vagon: string;
-    station_from: string;
-    station_to: string;
-    chief: string;
-    conductor: string;
-    seat: string;
-    linen_issued: string;
-    passenger: string;
-    created_at: string;
-    updated_at: string;
-}
+    // Sanctum (email + пароль)
+    auth: {
+        register: (data: { name: string; email: string; password: string }) =>
+            request<{ user: any; token: string }>('/register', {
+                method: 'POST',
+                body: JSON.stringify(data),
+            }).then(res => {
+                setToken(res.token);
+                return res;
+            }),
+        login: (email: string, password: string) =>
+            request<{ user: any; token: string }>('/login', {
+                method: 'POST',
+                body: JSON.stringify({ email, password }),
+            }).then(res => {
+                setToken(res.token);
+                return res;
+            }),
+        logout: () =>
+            request('/logout', { method: 'POST' }).finally(() => {
+                removeToken();
+            }),
+        me: () => request<any>('/me'),
+    },
 
-export interface CreateResultData {
-    trainee_name: string;
-    session_title: string;
-    score: string;
-    time: string;
-}
+    // Задачи
+    tasks: {
+        getAll: () => request<any[]>('/tasks'),
+        getOne: (id: number) => request<any>(`/tasks/${id}`),
+        create: (data: any) => request('/tasks', { method: 'POST', body: JSON.stringify(data) }),
+        update: (id: number, data: any) => request(`/tasks/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+        delete: (id: number) => request(`/tasks/${id}`, { method: 'DELETE' }),
+    },
 
-class ApiClient {
-    private async request<T>(
-        endpoint: string,
-        options: RequestInit = {}
-    ): Promise<T> {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers,
-            },
-            ...options,
-        });
+    // Результаты
+    results: {
+        getAll: () => request<any[]>('/results'),
+        getOne: (id: number) => request<any>(`/results/${id}`),
+        create: (data: any) => request('/results', { method: 'POST', body: JSON.stringify(data) }),
+        update: (id: number, data: any) => request(`/results/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+        delete: (id: number) => request(`/results/${id}`, { method: 'DELETE' }),
+    },
 
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'API request failed');
-        }
-
-        return response.json();
-    }
-
-    // Tasks
-    async getTasks(): Promise<Task[]> {
-        return this.request<Task[]>('/tasks');
-    }
-
-    async createTask(data: { title: string; description: string }): Promise<Task> {
-        return this.request<Task>('/tasks', {
+    // Сохранение ученика и результата (для старых страниц)
+    saveTrainee: (name: string, session: string) =>
+        request<{ data: { id: number } }>('/auth/trainee/register', {
             method: 'POST',
-            body: JSON.stringify(data),
-        });
-    }
+            body: JSON.stringify({ fio: name, title: session })
+        }),
 
-    async updateTask(id: number, data: { title: string; description: string }): Promise<Task> {
-        return this.request<Task>(`/tasks/${id}`, {
-            method: 'PUT',
-            body: JSON.stringify(data),
-        });
-    }
-
-    async deleteTask(id: number): Promise<void> {
-        return this.request<void>(`/tasks/${id}`, {
-            method: 'DELETE',
-        });
-    }
-
-    // Results
-    async getResults(search?: string): Promise<Result[]> {
-        const query = search ? `?search=${encodeURIComponent(search)}` : '';
-        return this.request<Result[]>(`/results${query}`);
-    }
-
-    async saveResult(data: CreateResultData): Promise<Result> {
-        return this.request<Result>('/results', {
+    saveResult: (data: { trainee_name: string; session_title: string; score: string; time: string }) =>
+        request<{ id: number }>('/results', {
             method: 'POST',
-            body: JSON.stringify(data),
-        });
-    }
+            body: JSON.stringify(data)
+        }),
 
-    // Trainees
-    async saveTrainee(fio: string, title: string): Promise<any> {
-        return this.request<any>('/trainees', {
-            method: 'POST',
-            body: JSON.stringify({ fio, title }),
-        });
-    }
+    getTasks: () => request<any[]>('/tasks'),
 
-    // Teacher login
-    async teacherLogin(password: string): Promise<{ success: boolean; message: string }> {
-        return this.request<{ success: boolean; message: string }>('/teacher/login', {
-            method: 'POST',
-            body: JSON.stringify({ password }),
-        });
-    }
+    createTask: (data: { title: string; description: string }) =>
+        request('/tasks', { method: 'POST', body: JSON.stringify(data) }),
+};
 
-    // Document GY-23
-    async saveDocumentGY(data: Partial<DocumentGY> & { result_id: number; trainee_id: number; task_id: number }): Promise<{ success: boolean; data: DocumentGY }> {
-        return this.request<{ success: boolean; data: DocumentGY }>('/documents/gu23', {
-            method: 'POST',
-            body: JSON.stringify(data),
-        });
-    }
-
-    async getDocumentGY(resultId: number): Promise<{ success: boolean; data: DocumentGY }> {
-        return this.request<{ success: boolean; data: DocumentGY }>(`/documents/gu23/${resultId}`);
-    }
-
-    // Document LY-23
-    async saveDocumentLY(data: Partial<DocumentLY> & { result_id: number; trainee_id: number; task_id: number }): Promise<{ success: boolean; data: DocumentLY }> {
-        return this.request<{ success: boolean; data: DocumentLY }>('/documents/ly23', {
-            method: 'POST',
-            body: JSON.stringify(data),
-        });
-    }
-
-    async getDocumentLY(resultId: number): Promise<{ success: boolean; data: DocumentLY }> {
-        return this.request<{ success: boolean; data: DocumentLY }>(`/documents/ly23/${resultId}`);
-    }
-
-    // Get all documents by trainee
-    async getDocumentsByTrainee(traineeId: number): Promise<{ success: boolean; data: { gu23: DocumentGY[]; ly23: DocumentLY[] } }> {
-        return this.request<{ success: boolean; data: { gu23: DocumentGY[]; ly23: DocumentLY[] } }>(`/documents/trainee/${traineeId}`);
-    }
-}
-
-export const api = new ApiClient();
+export default api;

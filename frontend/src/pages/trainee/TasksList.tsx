@@ -36,16 +36,36 @@ export default function TasksList({ onNavigate }: TasksListProps) {
     }, []);
 
     const fetchTasks = async () => {
-        try {
-           const response = await fetch('http://localhost:8000/api/tasks/visible');
-            const data = await response.json();
-            setTasks(data);
-        } catch (error) {
-            console.error('Ошибка загрузки задач:', error);
-        } finally {
+    try {
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('userId');
+        
+        // Получаем информацию о пользователе с его group_id
+        const userRes = await fetch('http://localhost:8000/api/profile', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const userData = await userRes.json();
+        const groupId = userData.group_id;
+        
+        if (!groupId) {
+            setTasks([]);
             setLoading(false);
+            return;
         }
-    };
+        
+        // Загружаем задачи, назначенные группе ученика
+        const response = await fetch(`http://localhost:8000/api/groups/${groupId}/tasks`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        setTasks(Array.isArray(data) ? data : []);
+    } catch (error) {
+        console.error('Ошибка загрузки задач:', error);
+        setTasks([]);
+    } finally {
+        setLoading(false);
+    }
+};
 
     const handleLogout = async () => {
         const token = localStorage.getItem('token');

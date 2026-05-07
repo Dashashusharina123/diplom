@@ -5,7 +5,7 @@ import './TeacherPages.css';
 interface Trainee {
     id: number;
     fio: string;
-    title: string;
+    group_name?: string;
     email: string;
     created_at: string;
 }
@@ -22,39 +22,28 @@ export default function TraineesList({ onNavigate }: TraineesListProps) {
     useEffect(() => {
         const fetchTrainees = async () => {
             try {
-                console.log('Загрузка учеников...');
-                
                 const response = await fetch('http://localhost:8000/api/trainees', {
                     method: 'GET',
-                    credentials: 'include',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                    }
+                    credentials: 'include'
                 });
-                
-                console.log('Статус ответа:', response.status);
-                
+
                 if (!response.ok) {
                     throw new Error(`Ошибка HTTP: ${response.status}`);
                 }
-                
+
                 const data = await response.json();
-                console.log('Получены данные:', data);
+                console.log('Ответ сервера:', data);
                 
-                // Проверяем структуру ответа
+                // Берем массив из поля trainees
                 let traineesArray = [];
                 if (data.trainees && Array.isArray(data.trainees)) {
-                    // Если пришёл объект с полем trainees
                     traineesArray = data.trainees;
                 } else if (Array.isArray(data)) {
-                    // Если пришёл массив напрямую
                     traineesArray = data;
                 } else {
                     traineesArray = [];
                 }
                 
-                console.log('Массив учеников:', traineesArray);
                 setTrainees(traineesArray);
             } catch (error) {
                 console.error('Ошибка загрузки:', error);
@@ -63,7 +52,7 @@ export default function TraineesList({ onNavigate }: TraineesListProps) {
                 setLoading(false);
             }
         };
-        
+
         fetchTrainees();
     }, []);
 
@@ -99,14 +88,13 @@ export default function TraineesList({ onNavigate }: TraineesListProps) {
                 <div className="teacher-card-header">
                     <h3 style={{ margin: 0, color: '#fff' }}>Всего учеников: {trainees.length}</h3>
                 </div>
-                
+
                 {trainees.length === 0 ? (
-                    <div className="empty-state">📭 Нет зарегистрированных учеников</div>
+                    <div className="empty-state">Нет зарегистрированных учеников</div>
                 ) : (
                     <table className="teacher-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
                                 <th>ФИО</th>
                                 <th>Группа</th>
                                 <th>Email</th>
@@ -116,9 +104,8 @@ export default function TraineesList({ onNavigate }: TraineesListProps) {
                         <tbody>
                             {trainees.map((trainee) => (
                                 <tr key={trainee.id}>
-                                    <td>{trainee.id}</td>
-                                    <td><strong>{trainee.fio}</strong></td>
-                                    <td>{trainee.title || '—'}</td>
+                                    <td>{trainee.fio}</td>
+                                    <td>{trainee.group_name || '—'}</td>
                                     <td>{trainee.email || '—'}</td>
                                     <td>{new Date(trainee.created_at).toLocaleDateString()}</td>
                                 </tr>

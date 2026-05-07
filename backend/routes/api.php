@@ -6,6 +6,7 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ResultController;
 use App\Http\Controllers\TraineeController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\GroupController;
 
 // ========== АУТЕНТИФИКАЦИЯ ==========
 
@@ -45,11 +46,11 @@ Route::put('/results/{id}', [ResultController::class, 'update'])->whereNumber('i
 Route::delete('/results/{id}', [ResultController::class, 'destroy'])->whereNumber('id');
 
 // Ученики
-Route::get('/trainees', [TraineeController::class, 'index']);
-Route::get('/trainees/{id}', [TraineeController::class, 'show'])->whereNumber('id');
-Route::post('/trainees', [TraineeController::class, 'store']);
-Route::put('/trainees/{id}', [TraineeController::class, 'update'])->whereNumber('id');
-Route::delete('/trainees/{id}', [TraineeController::class, 'destroy'])->whereNumber('id');
+// Ученики - используем AuthController вместо TraineeController
+Route::get('/trainees', [AuthController::class, 'getTrainees']);
+Route::get('/trainees/{id}', [AuthController::class, 'getTrainee'])->whereNumber('id');
+Route::put('/trainees/{id}', [AuthController::class, 'updateTrainee'])->whereNumber('id');
+Route::delete('/trainees/{id}', [AuthController::class, 'deleteTrainee'])->whereNumber('id');
 
 // Документы
 Route::get('/documents/gu23/{resultId}', [DocumentController::class, 'getGY'])->whereNumber('resultId');
@@ -77,3 +78,22 @@ Route::middleware('auth:sanctum')->get('/me', [AuthController::class, 'me']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 Route::post('/results/{id}/comment', [ResultController::class, 'addComment']);
 Route::get('/results/{id}/comment', [ResultController::class, 'getComment']);
+
+// Профиль (требует авторизации)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/profile', [AuthController::class, 'getProfile']);
+    Route::put('/profile', [AuthController::class, 'updateProfile']);
+});
+
+Route::get('/users/{id}/stats', [ResultController::class, 'getUserStats']);
+
+// Группы
+// Группы
+Route::get('/groups', [GroupController::class, 'index']);
+Route::get('/groups/select', [GroupController::class, 'getSelectList']);
+Route::post('/groups', [GroupController::class, 'store']);
+Route::put('/groups/{id}', [GroupController::class, 'update']);
+Route::delete('/groups/{id}', [GroupController::class, 'destroy']);
+Route::get('/groups/{groupId}/tasks', [GroupController::class, 'getGroupTasks']);
+Route::post('/groups/{groupId}/assign-task', [GroupController::class, 'assignTask']);
+Route::delete('/groups/{groupId}/remove-task', [GroupController::class, 'removeTask']);

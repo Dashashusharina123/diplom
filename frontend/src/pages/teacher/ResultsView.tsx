@@ -4,7 +4,9 @@ import './TeacherPages.css';
 
 interface Result {
     id: number;
+    user_id?: number;
     trainee_name: string;
+    trainee_group?: string;  // ← ДОБАВИТЬ поле группы
     session_title: string;
     score: string;
     time: string;
@@ -39,22 +41,19 @@ export default function ResultsView({ onNavigate }: ResultsViewProps) {
     const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
     const [showDocModal, setShowDocModal] = useState(false);
     
-    // Состояния для редактирования комментария
     const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
     const [editingCommentText, setEditingCommentText] = useState('');
     const [savingComments, setSavingComments] = useState<Set<number>>(new Set());
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const saveTimeoutRef = useRef<number | null>(null);
 
     useEffect(() => {
         fetchResults();
     }, []);
 
     useEffect(() => {
-        // Автофокус на textarea при начале редактирования
         if (editingCommentId !== null && textareaRef.current) {
             textareaRef.current.focus();
-            // Устанавливаем курсор в конец текста
             const length = textareaRef.current.value.length;
             textareaRef.current.setSelectionRange(length, length);
         }
@@ -101,9 +100,7 @@ export default function ResultsView({ onNavigate }: ResultsViewProps) {
         }
     };
 
-    // Начать редактирование комментария
     const startEditing = (result: Result) => {
-        // Очищаем предыдущий таймаут если есть
         if (saveTimeoutRef.current) {
             clearTimeout(saveTimeoutRef.current);
         }
@@ -111,9 +108,7 @@ export default function ResultsView({ onNavigate }: ResultsViewProps) {
         setEditingCommentText(result.teacher_comment || '');
     };
 
-    // Сохранить комментарий
     const saveComment = async (resultId: number, commentText: string) => {
-        // Проверяем, что комментарий изменился
         const originalResult = results.find(r => r.id === resultId);
         if (originalResult && originalResult.teacher_comment === commentText) {
             setEditingCommentId(null);
@@ -135,7 +130,6 @@ export default function ResultsView({ onNavigate }: ResultsViewProps) {
             });
             
             if (response.ok) {
-                // Обновить локальный список
                 setResults(prev => prev.map(r => 
                     r.id === resultId 
                         ? { ...r, teacher_comment: commentText }
@@ -159,9 +153,7 @@ export default function ResultsView({ onNavigate }: ResultsViewProps) {
         }
     };
 
-    // Обработчик потери фокуса
     const handleBlur = (resultId: number) => {
-        // Используем таймаут, чтобы не конфликтовать с кликом на другие элементы
         if (saveTimeoutRef.current) {
             clearTimeout(saveTimeoutRef.current);
         }
@@ -172,7 +164,6 @@ export default function ResultsView({ onNavigate }: ResultsViewProps) {
         }, 200);
     };
 
-    // Обработчик нажатия Enter (сохранить и выйти)
     const handleKeyDown = (e: React.KeyboardEvent, resultId: number) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -205,6 +196,7 @@ export default function ResultsView({ onNavigate }: ResultsViewProps) {
 
     const filteredResults = results.filter(r =>
         r.trainee_name?.toLowerCase().includes(filter.toLowerCase()) ||
+        r.trainee_group?.toLowerCase().includes(filter.toLowerCase()) ||
         r.session_title?.toLowerCase().includes(filter.toLowerCase())
     );
 
@@ -223,7 +215,7 @@ export default function ResultsView({ onNavigate }: ResultsViewProps) {
                 <div className="teacher-card-header">
                     <input
                         type="text"
-                        placeholder="Поиск по ученику или сессии..."
+                        placeholder="Поиск по ученику или группе..."
                         value={filter}
                         onChange={(e) => setFilter(e.target.value)}
                     />
@@ -236,89 +228,87 @@ export default function ResultsView({ onNavigate }: ResultsViewProps) {
                 ) : (
                     <div className="table-responsive">
                         <table className="teacher-table">
-  <thead>
-    <tr>
-      <th>Ученик</th>
-      <th>Сессия</th>
-      <th>Результат</th>
-      <th>Время</th>
-      <th>Дата</th>
-      <th>Документ</th>
-      <th style={{ width: '30%' }}>Комментарий</th>
-    </tr>
-  </thead>
+                            <thead>
+                                <tr>
+                                    <th>Ученик</th>
+                                    <th>Группа</th>  {/* ← Вместо "Сессия" */}
+                                    <th>Результат</th>
+                                    <th>Время</th>
+                                    <th>Дата</th>
+                                    <th>Документ</th>
+                                    <th style={{ width: '30%' }}>Комментарий</th>
+                                </tr>
+                            </thead>
 
-  <tbody>
-    {filteredResults.map((result) => (
-      <tr key={result.id}>
-        <td>{result.trainee_name}</td>
-        <td>{result.session_title}</td>
-
-        <td>
-          <span className={`score-badge ${getScoreClass(result.score)}`}>
-            {result.score}
-          </span>
-        </td>
-
-        <td>{result.time}</td>
-        <td>{new Date(result.created_at).toLocaleDateString()}</td>
-
-        <td>
-          <button
-            className="view-docs-btn"
-            onClick={() => fetchDocument(result.id, result.trainee_name)}
-          >
-            Смотреть акт
-          </button>
-        </td>
-
-        <td>
-          {editingCommentId === result.id ? (
-            <div className="comment-edit-container">
-              <textarea
-                ref={textareaRef}
-                className="comment-textarea-inline"
-                value={editingCommentText}
-                onChange={(e) => setEditingCommentText(e.target.value)}
-                onBlur={() => handleBlur(result.id)}
-                onKeyDown={(e) => handleKeyDown(e, result.id)}
-                placeholder="Введите комментарий..."
-                rows={2}
-                disabled={savingComments.has(result.id)}
-                style={{ width: '100%' }}
-              />
-
-              {savingComments.has(result.id) && (
-                <div className="comment-saving"></div>
-              )}
-            </div>
-          ) : (
-            <div
-              className="comment-display"
-              onClick={() => startEditing(result)}
-              style={{ cursor: 'pointer' }}
-            >
-              {result.teacher_comment ? (
-                <div className="comment-text">
-                  {result.teacher_comment}
-                </div>
-              ) : (
-                <div className="comment-placeholder">
-                  Добавьте комментарий
-                </div>
-              )}
-            </div>
-          )}
-        </td>
-      </tr>
-    ))}
-  </tbody>
-</table>
+                            <tbody>
+                                {filteredResults.map((result) => (
+                                    <tr key={result.id}>
+                                        <td className="trainee-name-cell">
+                                            {result.trainee_name}
+                                        </td>
+                                        <td>
+                                            {result.trainee_group || '—'}
+                                        </td>
+                                        <td>
+                                            <span className={`score-badge ${getScoreClass(result.score)}`}>
+                                                {result.score}
+                                            </span>
+                                        </td>
+                                        <td>{result.time}</td>
+                                        <td>{new Date(result.created_at).toLocaleDateString()}</td>
+                                        <td>
+                                            <button
+                                                className="view-docs-btn"
+                                                onClick={() => fetchDocument(result.id, result.trainee_name)}
+                                            >
+                                                Смотреть акт
+                                            </button>
+                                        </td>
+                                        <td>
+                                            {editingCommentId === result.id ? (
+                                                <div className="comment-edit-container">
+                                                    <textarea
+                                                        ref={textareaRef}
+                                                        className="comment-textarea-inline"
+                                                        value={editingCommentText}
+                                                        onChange={(e) => setEditingCommentText(e.target.value)}
+                                                        onBlur={() => handleBlur(result.id)}
+                                                        onKeyDown={(e) => handleKeyDown(e, result.id)}
+                                                        placeholder="Введите комментарий..."
+                                                        rows={2}
+                                                        disabled={savingComments.has(result.id)}
+                                                        style={{ width: '100%' }}
+                                                    />
+                                                    {savingComments.has(result.id) && (
+                                                        <div className="comment-saving">💾 Сохранение...</div>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <div
+                                                    className="comment-display"
+                                                    onClick={() => startEditing(result)}
+                                                    style={{ cursor: 'pointer' }}
+                                                >
+                                                    {result.teacher_comment ? (
+                                                        <div className="comment-text">
+                                                            {result.teacher_comment}
+                                                        </div>
+                                                    ) : (
+                                                        <div className="comment-placeholder">
+                                                            Добавить комментарий
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 )}
             </div>
 
-            {/* Модальное окно просмотра документа */}
             {showDocModal && selectedDoc && (
                 <div className="modal-overlay" onClick={() => setShowDocModal(false)}>
                     <div className="modal-content-doc" onClick={(e) => e.stopPropagation()}>
@@ -374,6 +364,7 @@ export default function ResultsView({ onNavigate }: ResultsViewProps) {
                         </div>
                         <div className="modal-footer">
                             <button className="print-btn" onClick={() => window.print()}>Печать</button>
+                            <button className="close-btn" onClick={() => setShowDocModal(false)}>Закрыть</button>
                         </div>
                     </div>
                 </div>

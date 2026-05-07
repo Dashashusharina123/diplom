@@ -30,4 +30,8 @@ class Task extends Model
     {
         return $this->belongsTo(Document_LY::class, 'document_l_y_id');
     }
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class, 'group_tasks');
+    }
 }

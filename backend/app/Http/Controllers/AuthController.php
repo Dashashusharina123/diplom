@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -77,50 +79,55 @@ class AuthController extends Controller
      */
     public function registerTrainee(Request $request)
     {
+        // Добавьте логирование
+        Log::info('Register data:', $request->all());
+
         $validated = $request->validate([
             'fio' => 'required|string|max:255',
-            'title' => 'nullable|string|max:255',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:6'
+            'password' => 'required|min:6',
+            'group_id' => 'required|exists:groups,id'
         ]);
-
-        $existing = User::where('email', $validated['email'])->first();
-
-        if ($existing) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Пользователь с таким email уже существует',
-                'data' => $existing,
-                'is_new' => false
-            ]);
-        }
 
         $user = User::create([
             'fio' => $validated['fio'],
-            'title' => $validated['title'] ?? $validated['fio'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'role' => 'trainee'
+            'role' => 'trainee',
+            'group_id' => $validated['group_id']
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Ученик зарегистрирован',
-            'data' => $user,
-            'is_new' => true
+            'data' => $user
         ], 201);
     }
-
     /**
      * Получение всех учеников
      */
     public function getTrainees()
     {
         $trainees = User::where('role', 'trainee')
+            ->with('group')
             ->orderBy('fio')
-            ->get(['id', 'fio', 'title', 'email', 'created_at']);
+            ->get();
 
-        return response()->json($trainees);
+        return response()->json([
+            'trainees' => $trainees->map(function ($trainee) {
+                return [
+                    'id' => $trainee->id,
+                    'fio' => $trainee->fio,
+                    'email' => $trainee->email,
+                    'group_id' => $trainee->group_id,
+
+                    // ВОТ ГЛАВНОЕ
+                    'group_name' => $trainee->group?->name,
+
+                    'created_at' => $trainee->created_at,
+                ];
+            })
+        ]);
     }
 
     /**
@@ -148,7 +155,8 @@ class AuthController extends Controller
 
         $validated = $request->validate([
             'fio' => 'sometimes|string|max:255',
-            'title' => 'nullable|string|max:255'
+            'title' => 'nullable|string|max:255',
+            'group_id' => 'nullable|exists:groups,id'  // ← ДОБАВИТЬ ЭТУ СТРОКУ
         ]);
 
         $trainee->update($validated);
@@ -194,7 +202,6 @@ class AuthController extends Controller
             ], 401);
         }
 
-        // Создаем токен для ученика
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -205,7 +212,8 @@ class AuthController extends Controller
                 'id' => $user->id,
                 'name' => $user->fio,
                 'email' => $user->email,
-                'role' => $user->role
+                'role' => $user->role,
+                'group_id' => $user->group_id  // ← ДОБАВИТЬ ЭТО
             ]
         ]);
     }
@@ -239,6 +247,96 @@ class AuthController extends Controller
             'email' => $user->email,
             'role' => $user->role
         ]);
+    }
+
+
+
+    public function getProfile(Request $request)
+    {
+        try {
+            $user = $request->user();
+
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+
+            return response()->json([
+                'id' => $user->id,
+                'email' => $user->email,
+                'fio' => $user->fio,
+                'title' => $user->title,
+                'role' => $user->role,
+                'group_id' => $user->group_id,
+                'group' => $user->group ? [
+                    'id' => $user->group->id,
+                    'name' => $user->group->name
+                ] : null,
+                'created_at' => $user->created_at
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Get profile error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function updateProfile(Request $request)
+    {
+        try {
+            $user = $request->user();
+
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+
+            $validator = Validator::make($request->all(), [
+                'email' => 'sometimes|email|unique:users,email,' . $user->id,
+                'fio' => 'nullable|string|max:255',
+                'group_id' => 'nullable|exists:groups,id',
+                'current_password' => 'required_with:new_password|string',
+                'new_password' => 'nullable|string|min:6|confirmed'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            if ($request->has('email')) {
+                $user->email = $request->email;
+            }
+
+            if ($request->has('fio')) {
+                $user->fio = $request->fio;
+            }
+
+            if ($request->has('group_id')) {
+                $user->group_id = $request->group_id;
+            }
+
+            if ($request->has('new_password') && !empty($request->new_password)) {
+                if (!Hash::check($request->current_password, $user->password)) {
+                    return response()->json(['error' => 'Текущий пароль неверен'], 422);
+                }
+                $user->password = Hash::make($request->new_password);
+            }
+
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Профиль успешно обновлён',
+                'user' => [
+                    'id' => $user->id,
+                    'email' => $user->email,
+                    'fio' => $user->fio,
+                    'title' => $user->title,
+                    'role' => $user->role,
+                    'group_id' => $user->group_id
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Update profile error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
 }

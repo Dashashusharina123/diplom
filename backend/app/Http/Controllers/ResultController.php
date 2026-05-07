@@ -12,39 +12,44 @@ class ResultController extends Controller
         try {
             $results = DB::table('results')
                 ->select(
-                    'id',
-                    'user_id',
-                    'task_id',
-                    'score',
-                    'time',
-                    'teacher_comment',  // ← ДОБАВИТЬ
-                    'created_at'
+                    'results.id',
+                    'results.user_id',
+                    'results.task_id',
+                    'results.score',
+                    'results.time',
+                    'results.teacher_comment',
+                    'results.created_at'
                 )
                 ->orderBy('created_at', 'desc')
                 ->get();
 
-            // Добавляем имя ученика из users таблицы
             $results = $results->map(function($result) {
                 $user = DB::table('users')->where('id', $result->user_id)->first();
+
+                // Получаем название группы
+                $groupName = null;
+                if ($user && $user->group_id) {
+                    $group = DB::table('groups')->where('id', $user->group_id)->first();
+                    $groupName = $group ? $group->name : null;
+                }
+
                 return (object) [
                     'id' => $result->id,
+                    'user_id' => $result->user_id,
                     'trainee_name' => $user->fio ?? $user->name ?? 'Ученик',
+                    'trainee_group' => $groupName,
                     'session_title' => 'Тестирование',
                     'score' => $result->score,
                     'time' => $result->time,
-                    'teacher_comment' => $result->teacher_comment ?? null,  // ← ДОБАВИТЬ
-                    'created_at' => $result->created_at,
-                    'doc' => '📄'
+                    'teacher_comment' => $result->teacher_comment,
+                    'created_at' => $result->created_at
                 ];
             });
 
             return response()->json($results);
         } catch (\Exception $e) {
             Log::error('Results index error: ' . $e->getMessage());
-            return response()->json([
-                'error' => $e->getMessage(),
-                'line' => $e->getLine()
-            ], 500);
+            return response()->json(['error' => $e->getMessage(), 'line' => $e->getLine()], 500);
         }
     }
 
@@ -161,6 +166,81 @@ class ResultController extends Controller
                 'success' => false,
                 'message' => $e->getMessage()
             ], 500);
+        }
+    }
+
+
+    // Добавьте этот метод в ResultController.php
+
+    public function getUserStats($userId)
+    {
+        try {
+            $results = DB::table('results')
+                ->where('user_id', $userId)
+                ->get();
+
+            $totalTests = $results->count();
+
+            if ($totalTests === 0) {
+                return response()->json([
+                    'total_tests' => 0,
+                    'passed_tests' => 0,
+                    'failed_tests' => 0,
+                    'success_rate' => 0,
+                    'average_score_percent' => 0,
+                    'average_score_5' => 0,
+                    'best_result' => '—',
+                    'worst_result' => '—'
+                ]);
+            }
+
+            $passedTests = 0;
+            $totalPercent = 0;
+            $bestPercent = 0;
+            $worstPercent = 100;
+            $bestResultStr = '';
+            $worstResultStr = '';
+
+            foreach ($results as $result) {
+                $scoreParts = explode('/', $result->score);
+                $correct = (int)$scoreParts[0];
+                $total = (int)$scoreParts[1];
+                $percent = $total > 0 ? ($correct / $total) * 100 : 0;
+
+                $totalPercent += $percent;
+
+                if ($percent >= 70) {
+                    $passedTests++;
+                }
+
+                if ($percent > $bestPercent) {
+                    $bestPercent = $percent;
+                    $bestResultStr = $result->score;
+                }
+
+                if ($percent < $worstPercent) {
+                    $worstPercent = $percent;
+                    $worstResultStr = $result->score;
+                }
+            }
+
+            $averagePercent = $totalPercent / $totalTests;
+            $averageScore5 = ($averagePercent / 100) * 5;
+
+            return response()->json([
+                'total_tests' => $totalTests,
+                'passed_tests' => $passedTests,
+                'failed_tests' => $totalTests - $passedTests,
+                'success_rate' => round(($passedTests / $totalTests) * 100),
+                'average_score_percent' => round($averagePercent),
+                'average_score_5' => round($averageScore5, 1),
+                'best_result' => $bestResultStr,
+                'worst_result' => $worstResultStr
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Get user stats error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 }

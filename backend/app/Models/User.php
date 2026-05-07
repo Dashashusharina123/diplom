@@ -19,10 +19,7 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
-        'password',
-        'fio',
-        'title',
-        'role', // 'teacher' или 'trainee'
+        'email', 'password', 'fio', 'title', 'role', 'group_id'
     ];
 
     protected $hidden = [
@@ -38,5 +35,9 @@ class User extends Authenticatable
     public function results()
     {
         return $this->hasMany(Result::class, 'user_id');
+    }
+    public function group()
+    {
+        return $this->belongsTo(Group::class);
     }
 }

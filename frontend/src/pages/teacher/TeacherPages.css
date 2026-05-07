@@ -1223,3 +1223,435 @@
     content: "🗑";
     font-size: 14px;
 }
+/* ========== КЛИКАБЕЛЬНОЕ ИМЯ УЧЕНИКА ========== */
+.trainee-name-link {
+    background: none;
+    border: none;
+    color: #4caf50;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.trainee-name-link:hover {
+    background: rgba(76, 175, 80, 0.15);
+    transform: translateX(3px);
+    color: #66bb6a;
+}
+
+/* ========== INLINE КОММЕНТАРИИ ========== */
+.comment-display {
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    background: #222;
+    border: 1px solid #333;
+}
+
+.comment-display:hover {
+    background: #2a2a2a;
+    border-color: #4caf50;
+}
+
+.comment-text {
+    color: #ddd;
+    font-size: 13px;
+    line-height: 1.4;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.edit-hint {
+    opacity: 0;
+    font-size: 12px;
+    transition: opacity 0.2s;
+    color: #888;
+}
+
+.comment-display:hover .edit-hint {
+    opacity: 0.7;
+}
+
+.comment-placeholder {
+    color: #666;
+    font-style: italic;
+    font-size: 13px;
+}
+
+.comment-edit-container {
+    position: relative;
+}
+
+.comment-textarea-inline {
+    width: 100%;
+    padding: 8px 10px;
+    border: 2px solid #4caf50;
+    border-radius: 8px;
+    background: #1a1a1a;
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    resize: vertical;
+}
+
+.comment-textarea-inline:focus {
+    outline: none;
+    border-color: #66bb6a;
+}
+
+.comment-saving {
+    position: absolute;
+    bottom: -22px;
+    right: 5px;
+    font-size: 11px;
+    color: #4caf50;
+    background: #1a1a1a;
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+/* ========== ПРОФИЛЬ УЧЕНИКА (TraineeProfile) ========== */
+.trainee-profile-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.trainee-info-card {
+    margin-bottom: 24px;
+}
+
+.trainee-info-header {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    padding: 30px;
+}
+
+.trainee-avatar {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #ff4d4d, #ff8787);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    font-weight: bold;
+    color: white;
+    border: 3px solid #ffd700;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.trainee-info h2 {
+    color: #fff;
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.trainee-email,
+.trainee-group,
+.trainee-since {
+    color: #aaa;
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+.back-btn {
+    background: #555;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+    margin-top: 20px;
+}
+
+.back-btn:hover {
+    background: #666;
+    transform: translateY(-2px);
+}
+
+/* ========== АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ ========== */
+@media (max-width: 768px) {
+    .trainee-info-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+        gap: 15px;
+    }
+    
+    .trainee-profile-container {
+        padding: 10px;
+    }
+    
+    .comment-textarea-inline {
+        font-size: 11px;
+    }
+    
+    .trainee-name-link {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+}
+
+/* ========== ДОПОЛНИТЕЛЬНЫЕ УЛУЧШЕНИЯ ========== */
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* Индикатор сохранения */
+.comment-saving {
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+/* Стили для пустого комментария в таблице */
+.no-comment {
+    color: #666;
+    font-style: italic;
+    font-size: 12px;
+}
+
+/* Профиль */
+.profile-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.profile-card {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.profile-header {
+    background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+    padding: 40px;
+    text-align: center;
+    border-bottom: 1px solid #333;
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #ff4d4d, #ff8787);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    font-weight: bold;
+    color: white;
+    margin: 0 auto 20px;
+    border: 3px solid #ffd700;
+}
+
+.profile-header h2 {
+    color: #fff;
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.profile-role, .profile-title {
+    color: #aaa;
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+.profile-content {
+    padding: 30px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: #222;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #333;
+}
+
+.info-label {
+    color: #aaa;
+    font-size: 14px;
+}
+
+.info-value {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.edit-profile-btn, .change-password-btn {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.edit-profile-btn {
+    background: #2196f3;
+    color: white;
+}
+
+.edit-profile-btn:hover {
+    background: #0b7dda;
+}
+
+.change-password-btn {
+    background: #ff9800;
+    color: white;
+}
+
+.change-password-btn:hover {
+    background: #e68a00;
+}
+
+.profile-form, .password-form {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #333;
+}
+
+.profile-form h3, .password-form h3 {
+    color: #fff;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    color: #aaa;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #444;
+    border-radius: 10px;
+    background: #333;
+    color: #fff;
+    font-size: 14px;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #ff4d4d;
+}
+
+.profile-message {
+    padding: 12px 20px;
+    margin: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.profile-message.success {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4caf50;
+    border: 1px solid #4caf50;
+}
+
+.profile-message.error {
+    background: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+    border: 1px solid #f44336;
+}
+
+.profile-footer {
+    padding: 20px;
+    border-top: 1px solid #333;
+    text-align: center;
+}
+
+.back-btn {
+    background: #555;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.back-btn:hover {
+    background: #666;
+}
+.group-item-clickable {
+    transition: all 0.2s;
+}
+
+.group-item-clickable:hover {
+    border-color: #ffd700;
+    transform: translateX(5px);
+}
+
+.back-btn {
+    background: #555;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.back-btn:hover {
+    background: #666;
+}
+.tab-btn {
+    background: #333;
+    color: #aaa;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.tab-btn.active {
+    background: red;
+    color: white;
+}
+
+.tab-btn:hover:not(.active) {
+    background: #444;
+    color: #fff;
+}
